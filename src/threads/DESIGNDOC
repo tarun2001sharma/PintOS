@@ -1,0 +1,191 @@
+			+--------------------+
+			|         OS         |
+			| PROJECT 1: THREADS |
+			|   DESIGN DOCUMENT  |
+			+--------------------+
+
+---- GROUP ----
+
+>> Fill in the names, email addresses and matriculation numbers of your group members.
+
+Paras Gupta <gupta.paras@iitgn.ac.in> 19110128
+Shubh Lavti <sunil.sl@iitgn.ac.in> 19110090
+Tarun Sharma <sharma_tarun@iitgn.ac.in> 19110140
+
+---- PRELIMINARIES ----
+
+>> If you have any preliminary comments on your submission, notes for the
+>> TAs, or extra credit, please give them here.
+
+>> Please cite any offline or online sources you consulted while
+>> preparing your submission, other than the Pintos documentation, course
+>> text, lecture notes, and course staff.
+
+			     ALARM CLOCK
+			     ===========
+
+---- DATA STRUCTURES ----
+
+>> A1: Copy here the declaration of each new or changed `struct' or
+>> `struct' member, global or static variable, `typedef', or
+>> enumeration.  Identify the purpose of each in 25 words or less.
+
+---- ALGORITHMS ----
+
+>> A2: Briefly describe what happens in a call to timer_sleep(),
+>> including the effects of the timer interrupt handler.
+
+>> timer_sleep() function takes input as the number of ticks elapsed. 
+>> Then we assign the start time and sleep time for each current thread.
+>> Before blocking any current block, we have to disable the interupt 
+>> function - intr_disable(). After disabling the thread, enable interupt
+>> function.
+
+>> A3: What steps are taken to minimize the amount of time spent in
+>> the timer interrupt handler?
+
+>> The threads in thread_list are stored in increasing order with their 
+>> wake_up_ticks. This minimises the time spent in interupt handler.
+
+---- SYNCHRONIZATION ----
+
+>> A4: How are race conditions avoided when multiple threads call
+>> timer_sleep() simultaneously?
+
+>> When the running thread is being put to sleep, it is inserted into 
+>> the sleeping thread list and then blocked, during this the interupts are 
+>> disabled which prevent any other thread from interfering in the 
+>> process.
+
+>> A5: How are race conditions avoided when a timer interrupt occurs
+>> during a call to timer_sleep()?
+
+>> When the thread is put to sleep, at wake time it comes to into ready state.
+>> In the previous design, useless threads were being called by the scheduler 
+>> which decreased the time efficiency of the program.
+
+---- RATIONALE ----
+
+>> A6: Why did you choose this design?  In what ways is it superior to
+>> another design you considered?
+
+
+    		     PROD/CONS
+	  		     =========
+
+---- SYNCHRONIZATION ----
+
+>> B1: How does your solution guarantee that consumers will hold until
+>> there is something to consume in the buffer?
+
+>> Our solution ensures that the consumer will hold out by running a while
+>> loop indefinitely while the buffer is empty. The while loop contains the
+>> cond_wait(&fill, &mutex) function which puts the thread to sleep 
+>> (wait) until the producer fills the buffer with at least one entry. 
+
+>> B2: How does your solution guarantee that producers will hold until
+>> there is some free space in the buffer?
+
+>> Our solution ensures that the producer will hold out by running a while
+>> loop indefinitely while the buffer is completely filled. The while loop
+>> contains the cond_wait(&empty, &mutex) function which puts the thread 
+>> to sleep (wait) until the consumer consumes at least one entry to create
+>> some space in the buffer for the producer. 
+
+>> B3: How does your solution preserve a FIFO semantics i.e., the first
+>> character produced will be the first to be consumed?
+
+>> The 'in' and 'out' variables defined to traverse the shared buffer 
+>> during the execution of the producer and the consumer respectively
+>> are both initialized to zero. These variables are independetly
+>> incremented (out = out+1 % size, in = in+1 % size) when either of 
+>> the producer or the consumer process runs. The modulus ensures that
+>> the value of the 'in' and 'out' variables does not exceed the buffer
+>> size. This assures that a FIFO type semantic is preserved and the
+>> consumer starts the reading process from the firt character produced.  
+
+---- RATIONALE ----
+
+>> B4: Give an intuition for why your program preserves safety.
+
+>> Safety is preserved by making use of locks (mutex). The locks ensure
+>> that the no other process can interfere with the current process and that
+>> only one process is able to access the critical section (shared variables
+>> and buffer). Once the process completes its action, the lock is released.
+
+>> B5: Why did you choose this design? Did you consider other design
+>> alternatives? In what ways is it superior to another design you considered?
+
+>> We chose this design as the usage of conditional variables and locks ensures 
+>> the success of synchronization between the consumer and the producer processes.
+>> The solution takes care of mutual exclusion and progress which are a must for 
+>> any solution to the problem of synchronization. We also considered the design of
+>> the solution using semaphores.
+
+
+			     NARROW BRIDGE
+			     =============
+
+---- SYNCHRONIZATION ----
+
+>> C1: How does your solution guarantee that no more that 3 vehicles
+>> are crossing the bridge in the same direction?
+
+>> We can design a solution where we use semaphores to keep track of the 
+>> the number of vehicles that are currenly crossing the bridge in the same
+>> direction.
+
+>> C2: What prevents vehicles from opposite directions from crossing the
+>> bridge simultaneously?
+
+>> We plan to make use of variables that keep track of the emergency vechicles
+>> and the other vechicles crossing the bridge in either of the directions,
+>> separately.
+
+>> C3: How does your solution grant priority to emergency vehicles over
+>> the queue of vehicles ahead in the same direction?
+
+>> Again, sempaphores can be used to check whether or not emergency vehicles
+>> are present to cross the bridge. Thc corresponding count is incremented or
+>> decremented accordingly.
+
+>> C4: How do you guarantee that despite having priority, emergency vehicles
+>> do not start crossing the bridge while there are still vehicles crossing
+>> it in the oposite direction?
+
+>> We keep the priority of the emergency vehicles crossing the bridge in the 
+>> left direction higher than those crossing it in the right direction.
+
+>> C5: Explain with examples why your solution does not preserve neither
+>> fairness nor freedom from starvation, other than what has been indicated
+>> for emergency vehicles.
+
+---- RATIONALE ----
+
+>> C6: Why did you choose this design? Did you consider other design
+>> alternatives? In what ways is it superior to another design you considered?
+
+
+			   SURVEY QUESTIONS
+			   ================
+
+Answering these questions is optional, but it will help us improve the
+course in future semesters.  Feel free to tell us anything you
+want--these questions are just to spur your thoughts.  You may also
+choose to respond anonymously in the course evaluations at the end of
+the semester.
+
+>> In your opinion, was this assignment, or any one of the three problems
+>> in it, too easy or too hard?  Did it take too long or too little time?
+
+>> Did you find that working on a particular part of the assignment gave
+>> you greater insight into some aspect of OS design?
+
+>> Is there some particular fact or hint we should give students in
+>> future semesters to help them solve the problems?  Conversely, did you
+>> find any of our guidance to be misleading?
+
+>> Do you have any suggestions for the TAs to more effectively assist
+>> students, either for future semesters or the remaining projects?
+
+>> Any other comments?
